@@ -10,9 +10,11 @@
 
 @import Foundation;
 
-typedef typeof(unsigned long)                                  predicate;
-typedef typeof(const predicate(^ _Nonnull )(predicate))        predicate_function;
-typedef restrict typeof(const predicate_function *) predicate_function_t;
+typedef typeof(unsigned long)                                       predicate;
+typedef typeof(const predicate(^ _Nonnull )(predicate))             predicate_function;
+typedef restrict typeof(const volatile predicate_function *)        predicate_function_t;
+typedef typeof(predicate_function(^ _Nonnull )(predicate_function)) predicate_function_node;
+typedef restrict typeof(volatile predicate_function_node *)   predicate_function_node_t;
 //typedef typeof(const predicate(^ _Nonnull const *)(predicate)) predicate_function_t;
 
 predicate_function(^ _Nonnull (^ _Nonnull synchronous_predicate_functions)(predicate_function))(predicate_function) =  ^ (predicate(^init_func)(predicate)) {
@@ -47,7 +49,7 @@ static predicate_function (^ _Nonnull compose)(predicate_function, predicate_fun
     return new_comp;
 };
 
-static unsigned long (^ _Nonnull (^ _Nonnull (^ _Nonnull objects_iterator)(void))(predicate_function))(void) = ^{
+static unsigned long (^ _Nonnull (^ _Nonnull (^ _Nonnull predicate_function_composition)(void))(predicate_function))(void) = ^{
     __block unsigned long audio_state_cond = 0UL;
     static volatile predicate_function object_composition = ^ unsigned long (unsigned long c) { printf("invocation #%lu\n", c); return c; };
     return ^ (predicate_function object) { // Replace block object with the combine_predicate_functions block
@@ -64,7 +66,7 @@ static unsigned long (^ _Nonnull (^ _Nonnull (^ _Nonnull objects_iterator)(void)
 };
 
 
-static void (^wxyz)(void) = ^{
+static void (^ _Nullable wxyz)(void) = ^{
     predicate_function pf1 = ^ predicate (predicate p) { printf("p == %lu\n", p); return p; };
     predicate_function pf2 = ^ predicate (predicate p) { printf("p == %lu\n", (p = p + 1)); return p; };
     predicate_function pfx = combine_predicate_functions(pf1)(pf2)(^ (predicate_function_t init_func_t, predicate_function_t inter_func_t, predicate pred) {
@@ -76,8 +78,8 @@ static void (^wxyz)(void) = ^{
     pfx(55);
 };
 
-static void (^abcd)(void) = ^{
-    unsigned long(^(^asdf)(predicate_function))(void) = objects_iterator();
+static void (^ _Nullable abcd)(void) = ^{
+    unsigned long(^(^asdf)(predicate_function))(void) = predicate_function_composition();
     predicate_function pf1 = ^ predicate (predicate p) { printf("pf1 == %lu\n", p); return p; };
     predicate_function pf2 = ^ predicate (predicate p) { printf("pf2 == %lu\n", (p = p + 1)); return p; };
     
